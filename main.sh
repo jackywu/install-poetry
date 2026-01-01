@@ -2,8 +2,18 @@
 
 set -eo pipefail
 
+# Determine Python command
+if command -v python3 >/dev/null 2>&1; then
+    PYTHON_CMD=python3
+elif command -v python >/dev/null 2>&1; then
+    PYTHON_CMD=python
+else
+    echo "Python not found. Please install Python."
+    exit 1
+fi
+
 download_script() {
-  python3 -c 'import urllib.request, sys; print(urllib.request.urlopen(f"{sys.argv[1]}").read().decode("utf8"))' $1
+  $PYTHON_CMD -c 'import urllib.request, sys; print(urllib.request.urlopen(f"{sys.argv[1]}").read().decode("utf8"))' $1
 }
 
 INSTALL_PATH="${POETRY_HOME:-$HOME/.local}"
@@ -25,10 +35,10 @@ echo -e "${YELLOW}Installing Poetry 👷${RESET}\n"
 if [ "$VERSION" == "latest" ]; then
   # Note: If we quote installation arguments, the call below fails
   # shellcheck disable=SC2086
-  POETRY_HOME=$INSTALL_PATH python3 "$INSTALLATION_SCRIPT" --yes $INSTALLATION_ARGUMENTS
+  POETRY_HOME=$INSTALL_PATH $PYTHON_CMD "$INSTALLATION_SCRIPT" --yes $INSTALLATION_ARGUMENTS
 else
   # shellcheck disable=SC2086
-  POETRY_HOME=$INSTALL_PATH python3 "$INSTALLATION_SCRIPT" --yes --version="$VERSION" $INSTALLATION_ARGUMENTS
+  POETRY_HOME=$INSTALL_PATH $PYTHON_CMD "$INSTALLATION_SCRIPT" --yes --version="$VERSION" $INSTALLATION_ARGUMENTS
 fi
 
 echo "$INSTALL_PATH/bin" >>"$GITHUB_PATH"
