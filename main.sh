@@ -2,6 +2,11 @@
 
 set -eo pipefail
 
+# Ensure Python is in PATH if pythonLocation is set (for Windows Git Bash compatibility)
+if [ -n "$pythonLocation" ]; then
+    export PATH="$pythonLocation:$PATH"
+fi
+
 # Determine Python command
 if command -v python3 >/dev/null 2>&1; then
     PYTHON_CMD=python3
